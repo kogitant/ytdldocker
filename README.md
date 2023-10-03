@@ -2,13 +2,16 @@
 https://github.com/ytdl-org/youtube-dl
 
 # Build the image
+docker rmi --force ytdl:master
+docker rmi --force ytdl:release
 
-	docker rmi --force ytdl:latest
-	docker build -t ytdl:latest .
+docker build -t ytdl:base -f base.Dockerfile .
+docker build -t ytdl:master -f master.Dockerfile .
+docker build -t ytdl:release -f release.Dockerfile .
 
 # List available subs
 ```
-Antti.Koivisto@AMMAC24782 ytdldocker % docker run -v $(pwd):/workdir -it ytdl:latest --config-location /workdir/ytdl.config --list-subs "https://www.youtube.com/watch?v=PiQ_eZFO2GU"
+Antti.Koivisto@AMMAC24782 ytdldocker % docker run -v $(pwd):/workdir -it ytdl:release --config-location /workdir/ytdl.config --list-subs "https://www.youtube.com/watch?v=PiQ_eZFO2GU"
 [youtube] PiQ_eZFO2GU: Downloading webpage
 Available automatic captions for PiQ_eZFO2GU:
 Language formats
@@ -145,9 +148,14 @@ en       vtt, ttml, srv3, srv2, srv1
 
 # Use it
 
-	docker run -v $(pwd):/workdir -it ytdl:latest --config-location /workdir/ytdl.config --batch-file /workdir/ccoe.txt
+	docker run -v $(pwd):/workdir -it ytdl:release --config-location /workdir/ytdl.config --batch-file /workdir/ccoe.txt
 
-# Example urls.txt
+# Use cookies from Chrome and a previously downloaded info json
 
-	https://www.youtube.com/watch?v=IIiIoMGTJec
-	https://www.youtube.com/watch?v=6wOkmFHhkO8
+	docker run -v $(pwd):/workdir -it ytdl:release --config-location /workdir/ytdl.config --batch-file /workdir/genai.txt --cookies /workdir/www.youtube.com_cookies.txt --load-info-json /workdir/downloads/OpenAI/20230920_sqQrN0iZBs0_Introducing_DALL_E_3/20230920_sqQrN0iZBs0_Introducing_DALL_E_3.info.json 
+
+# Video conversion for PPT
+
+```
+ffmpeg -i 20230920_sqQrN0iZBs0_Introducing_DALL_E_3.mp4  -vcodec libx264 -acodec aac output.mp4
+```
